@@ -49,8 +49,10 @@ Hay dos colores: beige/arena y blanco. Ambiente "hotel minimalista": ratán, pla
 "¿Tu cama nivel hotel? Mira este juego. Los lazos van en relieve, se sienten al tocarlos. Es suave, transpirable y sirve para todo el año. Va directo a la lavadora. Hay ocho tamaños, en blanco o beige. Ojo: es la funda, el relleno no viene incluido. Y es el regalo perfecto. Toca el carrito y elige tu tamaño."
 
 ## Sonido
-Solo lleva efectos generados por código: un *whoosh* en cada barrido y un *pop* en el gancho y en cada grupo de tarjetas (nunca más de uno por segundo).
-**No lleva música**, porque no se proporcionó ninguna. Añade un sonido en tendencia de la biblioteca comercial de TikTok al publicar, a unos −20 dB bajo los efectos o la voz.
+- **Música:** una base lo-fi / pop minimalista **original**, compuesta por código con `music.py` (piano eléctrico, bajo, batería y campanita; Fa–Mi–Re–Do a 75 BPM). Es libre de derechos porque no usa ninguna canción existente. En el cierre (22.6 s) sube unos +3 dB y termina con un fundido.
+- **Efectos:** un *whoosh* en cada barrido y un *pop* en el gancho y en cada grupo de tarjetas, nunca más de uno por segundo.
+- **Mezcla final** normalizada a unos −14 LUFS, con picos por debajo de −1.5 dBTP.
+- **Sin voz.** Si grabas el guion de voz, baja la música hasta que quede unos −20 dB por debajo de la voz. También puedes cambiarla por un sonido en tendencia de TikTok desde la app.
 
 ## Volver a generarlo
 ```bash
@@ -58,7 +60,11 @@ Solo lleva efectos generados por código: un *whoosh* en cada barrido y un *pop*
 mkdir fonts && cd fonts
 for p in big-shoulders-display archivo instrument-serif; do npm pack @fontsource/$p; done
 for f in *.tgz; do tar xzf $f; mv package ${f%.tgz}; done; cd ..
-python3 render.py assets fonts salida.mp4            # vídeo completo
+python3 render.py assets fonts salida.mp4            # vídeo + efectos (salida.mp4.sfx.wav)
+python3 music.py musica.wav 26                       # música original
+ffmpeg -i salida.mp4 -i musica.wav -i salida.mp4.sfx.wav -filter_complex \
+  "[1:a]volume=-6dB[m];[2:a]volume=-2dB[s];[m][s]amix=inputs=2:normalize=0,loudnorm=I=-14:TP=-1.5:LRA=11[a]" \
+  -map 0:v -map "[a]" -c:v copy -c:a aac -b:a 192k final.mp4
 python3 render.py assets fonts salida.mp4 1.5 8.5    # solo fotogramas de prueba
 ```
 `assets/` guarda los recortes de las capturas, sin la interfaz de la app ni los textos de la ficha (el aviso, los iconos, la lavadora y las muestras de color).
