@@ -1,6 +1,6 @@
 # TikTok Shop · Juego de ropa de cama con lazos en relieve
 
-Vídeo: `video-tiktokshop-juego-cama-lazos.mp4` (1080×1920, 30 fps, 26 s, H.264 + AAC).
+Vídeo: `video-tiktokshop-juego-cama-lazos.mp4` (1080×1920, 30 fps, 21,9 s, H.264 + AAC), con voz en off, música y efectos.
 
 ## Análisis del producto
 
@@ -25,18 +25,20 @@ Hay dos colores: beige/arena y blanco. Ambiente "hotel minimalista": ratán, pla
 - **Color.** La ficha avisa de que el color varía con la luz. No se ha tocado el color de las fotos.
 - **Material.** Es fibra de poliéster: no decir "algodón".
 
-## Guion (lo que aparece en pantalla)
+## Guion (sincronizado con la voz)
 
-| Tiempo | Plano | Texto | Movimiento |
+Los cortes, los subtítulos, las tarjetas y los zooms caen en la palabra que se está diciendo (ver `timing.json`).
+
+| Tiempo | Plano | Voz / texto | Movimiento |
 |---|---|---|---|
-| 0.0–3.2 | Cama blanca | Gancho **TU CAMA / NIVEL HOTEL** · "Mira este juego / de ropa de cama" | Gancho que entra de golpe a los 0.1 s (110→100 %), empuje lento |
-| 3.2–6.4 | Cama beige + círculo de detalle | "Lazos en *relieve* / que se sienten" | Barrido rápido · el círculo aparece con *pop* · zoom a 112 % |
-| 6.4–9.8 | Beige con cojines | Tarjetas 1 Suave · 2 Transpirable · 3 Para todo el año · "Suave y fresca / todo el año" | Tarjetas escalonadas 120 ms |
-| 9.8–12.8 | Funda (sin la lavadora) | Tarjeta ✓ Lavable a máquina · "Directo a la lavadora / sin miedo" | Zoom a 112 % |
-| 12.8–16.0 | Beige ambiente | Tarjetas 8 tamaños · Blanco o beige · "Calidad de *hotel* / en 8 tamaños" | Empuje lento |
-| 16.0–19.4 | Beige, lateral | Tarjetas Funda + fundas · ! Relleno no incluido · "Ojo: es la funda / relleno no incluido" | Zoom a 112 % |
-| 19.4–22.6 | Cama blanca, otro encuadre | "El regalo *perfecto* / para estrenar casa" | Empuje lento |
-| 22.6–26.0 | Fondo Ink + miniatura | **TOCA EL CARRITO** · "Elige tu tamaño" | *Pop* de la tarjeta final |
+| 0.0–2.3 | Cama blanca | Gancho **TU CAMA / NIVEL HOTEL** · "Mira este juego" | Gancho que entra de golpe a los 0.1 s, empuje lento |
+| 2.3–5.3 | Beige + círculo de detalle | "Los lazos van / en *relieve* / se sienten al tocarlos" | Barrido · *pop* del círculo · zoom a 112 % en "relieve" |
+| 5.3–8.3 | Beige con cojines | Tarjetas 1 Suave · 2 Transpirable · 3 Para todo el año | Cada tarjeta entra con su palabra · empuje lento |
+| 8.3–9.7 | Funda | ✓ Lavable a máquina · "Va directo / a la lavadora" | Zoom a 112 % en "lavadora" |
+| 9.7–13.2 | Beige ambiente | Tarjetas 8 tamaños · Blanco o beige · "Calidad de *hotel* / en ocho tamaños / blanco o beige" | Empuje lento |
+| 13.2–16.2 | Beige, lateral | Tarjetas Funda + fundas · ! Relleno no incluido · "Ojo: es la funda / el relleno / no viene incluido" | Zoom a 112 % en "no" |
+| 16.2–18.8 | Cama blanca, otro encuadre | "El regalo *perfecto* / para estrenar casa" | Empuje lento |
+| 18.8–21.9 | Fondo Ink + miniatura | **TOCA EL CARRITO** (entra con "Toca") · "y elige tu tamaño" | *Pop* · la música sube al acabar la voz |
 
 ## Texto para publicar
 
@@ -45,14 +47,14 @@ Hay dos colores: beige/arena y blanco. Ambiente "hotel minimalista": ratán, pla
 
 **Hashtags:** #tiktokshop #ropadecama #decoracionhogar #dormitorio #fundanordica #coquette #lazos #regalosnavidad #hogar #roomdecor
 
-**Guion de voz opcional** (si quieres grabarte encima, ~24 s):
-"¿Tu cama nivel hotel? Mira este juego. Los lazos van en relieve, se sienten al tocarlos. Es suave, transpirable y sirve para todo el año. Va directo a la lavadora. Hay ocho tamaños, en blanco o beige. Ojo: es la funda, el relleno no viene incluido. Y es el regalo perfecto. Toca el carrito y elige tu tamaño."
+**Guion de la voz:**
+"¿Tu cama nivel hotel? Mira este juego. Los lazos van en relieve, se sienten al tocarlos. Suave, transpirable y para todo el año. Va directo a la lavadora. Calidad de hotel en ocho tamaños, blanco o beige. Ojo, es la funda, el relleno no viene incluido. El regalo perfecto para estrenar casa. Toca el carrito y elige tu tamaño."
 
 ## Sonido
-- **Música:** una base lo-fi / pop minimalista **original**, compuesta por código con `music.py` (piano eléctrico, bajo, batería y campanita; Fa–Mi–Re–Do a 75 BPM). Es libre de derechos porque no usa ninguna canción existente. En el cierre (22.6 s) sube unos +3 dB y termina con un fundido.
-- **Efectos:** un *whoosh* en cada barrido y un *pop* en el gancho y en cada grupo de tarjetas, nunca más de uno por segundo.
-- **Mezcla final** normalizada a unos −14 LUFS, con picos por debajo de −1.5 dBTP.
-- **Sin voz.** Si grabas el guion de voz, baja la música hasta que quede unos −20 dB por debajo de la voz. También puedes cambiarla por un sonido en tendencia de TikTok desde la app.
+- **Voz:** la grabación que mandó Niko (`assets/voz_original.wav`). Se cortó el "Cero segundos" del principio (la app leyó la marca de tiempo del guion) y todas las pausas de más de 0.1 s (`voice_edit.py`): pasa de 29.7 s a 21.0 s. Lleva una reducción de ruido suave y está normalizada a −14 LUFS.
+- **Música:** base lo-fi **original** de `music.py`, libre de derechos, a unos −20 dB por debajo de la voz. Sube +3 dB cuando termina la voz, en el cierre.
+- **Efectos:** un *whoosh* en cada barrido y un *pop* en el gancho y en la primera tarjeta, nunca a menos de 1 s de otro efecto.
+- **Mezcla final:** −14.7 LUFS, con un limitador en los picos.
 
 ## Volver a generarlo
 ```bash
@@ -60,11 +62,15 @@ Hay dos colores: beige/arena y blanco. Ambiente "hotel minimalista": ratán, pla
 mkdir fonts && cd fonts
 for p in big-shoulders-display archivo instrument-serif; do npm pack @fontsource/$p; done
 for f in *.tgz; do tar xzf $f; mv package ${f%.tgz}; done; cd ..
-python3 render.py assets fonts salida.mp4            # vídeo + efectos (salida.mp4.sfx.wav)
-python3 music.py musica.wav 26                       # música original
-ffmpeg -i salida.mp4 -i musica.wav -i salida.mp4.sfx.wav -filter_complex \
-  "[1:a]volume=-6dB[m];[2:a]volume=-2dB[s];[m][s]amix=inputs=2:normalize=0,loudnorm=I=-14:TP=-1.5:LRA=11[a]" \
-  -map 0:v -map "[a]" -c:v copy -c:a aac -b:a 192k final.mp4
-python3 render.py assets fonts salida.mp4 1.5 8.5    # solo fotogramas de prueba
+# voz: cortar el "cero segundos" (antes de 3.5 s) y las pausas; luego re-transcribir
+# el audio cortado (faster-whisper, word_timestamps=True) para obtener timing.json
+python3 voice_edit.py assets/voz_original.wav assets/voz_original_words.json voz.wav tmp_timing.json --start 3.5
+ffmpeg -i voz.wav -af "afftdn=nf=-30,loudnorm=I=-14:TP=-2:LRA=7" -ar 48000 voz_n.wav
+python3 render.py assets fonts timing.json salida.mp4          # vídeo + efectos (salida.mp4.sfx.wav)
+python3 render.py assets fonts timing.json salida.mp4 1.5 8.5  # solo fotogramas de prueba
+python3 music.py musica.wav 21.88 20.88                         # duración, inicio del cierre
+ffmpeg -i salida.mp4 -i voz_n.wav -i musica.wav -i salida.mp4.sfx.wav -filter_complex \
+  "[1:a]apad[v];[2:a]volume=-13.4dB[m];[3:a]volume=-8dB[s];[v][m][s]amix=inputs=3:normalize=0:duration=longest,alimiter=limit=0.89[a]" \
+  -map 0:v -map "[a]" -c:v copy -c:a aac -b:a 192k -t 21.88 final.mp4
 ```
 `assets/` guarda los recortes de las capturas, sin la interfaz de la app ni los textos de la ficha (el aviso, los iconos, la lavadora y las muestras de color).

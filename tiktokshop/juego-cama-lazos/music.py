@@ -1,9 +1,9 @@
 """Original, royalty-free lo-fi / minimal-pop bed synthesised from scratch.
 
 75 BPM (feels 150 with 8th-note hats), Fmaj7 - Em7 - Dm7 - Cmaj7, one bar each
-(3.2 s, the same length as most scenes). The outro bar is lifted ~+3 dB.
+(3.2 s). The outro (after the last spoken word) is lifted ~+3 dB.
 
-Usage: python3 music.py out.wav [duration_s]
+Usage: python3 music.py out.wav [duration_s] [outro_start_s]
 """
 import math
 import sys
@@ -14,6 +14,7 @@ import numpy as np
 SR = 48000
 OUT = sys.argv[1]
 DUR = float(sys.argv[2]) if len(sys.argv) > 2 else 26.0
+OUTRO = float(sys.argv[3]) if len(sys.argv) > 3 else DUR - 3.4
 BPM = 75
 BEAT = 60 / BPM
 BAR = 4 * BEAT
@@ -147,9 +148,9 @@ out = out * pump
 # vinyl-ish noise floor
 out += (rng.standard_normal(N) * 0.0025).astype(np.float32)
 
-# arrangement gain: lift the outro (from 22.6 s) ~+3 dB, fade in/out
+# arrangement gain: lift the outro ~+3 dB, fade in/out
 gain = np.ones(N, np.float32)
-gain[t >= 22.6] = 1.41
+gain[t >= OUTRO] = 1.41
 gain *= np.minimum(1, t / 0.25)
 gain *= np.clip((DUR - t) / 0.9, 0, 1)
 out = np.tanh(out * gain * 1.2) * 0.8
