@@ -25,15 +25,27 @@ los mismos subtítulos y los mismos colores** que la referencia.
      big-shoulders-display-900, instrument-serif-400-italic...). Si falta, baja otra OFL con
      `npm pack @fontsource/<nombre>` y copia el `.woff` a `referencia/fuentes/<nombre>-<peso>.woff`.
    - `tamano` (px sobre 1920 de alto), `mayusculas`, `palabras_por_subtitulo`,
-     `palabra_activa` (`caja` = caja de color detrás, `color` = la palabra cambia de color, `ninguna`),
+     `palabra_activa`:
+       - `caja` = caja de color detrás de la palabra que se dice,
+       - `color` = la palabra que se dice cambia de color,
+       - `lineas` = caja (`color_caja`) detrás de cada línea, las líneas aparecen una a una, una palabra
+         clave por grupo en `color_resalte` (de `palabras_clave` o la más larga); usa `ancho_linea`,
+       - `ninguna`,
      `color_texto`, `color_resalte`, `color_texto_en_caja`, `contorno`, `sombra`.
+   - Si la referencia tiene gráficos fijos encima (paneles, logos), vuelve a analizar con
+     `--excluir x0,y0,x1,y1` (fracciones) para que no cuenten en el color.
    - Comprueba también que `ritmo.cortes` tiene sentido (los cortes detectados de verdad).
 3. Transcribe la voz del vídeo nuevo (faster-whisper, `word_timestamps=True`) a
    `[{"w","s","e"}, ...]`. Si el modelo no se puede descargar (red bloqueada), pide a Niko la transcripción
    o los tiempos, y dilo en el informe.
 4. Fotogramas de prueba primero y revísalos:
    `python3 referencia/aplicar_referencia.py trabajo/ref/perfil.json VIDEO.mp4 salida.mp4 --palabras p.json --prueba 1 4 8`
-5. Render completo (mismo comando sin `--prueba`). Ajusta `--ancla-y` si el zoom corta la cara.
+5. Render completo (mismo comando sin `--prueba`). Ajusta `--ancla-y` si el zoom corta la cara y
+   `--intensidad-color` (0–1, por defecto 0.7) si el color queda forzado: cuanto más distinta es la luz
+   del vídeo frente a la referencia, más baja.
+
+Perfiles ya hechos (reutilizables): `referencia/perfiles/<nombre>/perfil.json`. El vídeo de referencia
+no se sube al repositorio (es contenido de otro creador); se trabaja en `trabajo/`, que está en .gitignore.
 6. Verifica: analiza `salida.mp4` con `analizar_referencia.py` y compara con la referencia
    (`plano_medio`, `cortes`, `hueco_max_tipico`, `saturacion_media`, `brillo_medio`, `temperatura_r_menos_b`).
 7. Informa: duración vieja → nueva, cortes de plano de la referencia vs. los del vídeo, diferencias de

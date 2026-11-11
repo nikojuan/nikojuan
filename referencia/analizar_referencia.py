@@ -13,7 +13,7 @@ Lo que no se puede medir de forma fiable (fuente exacta, palabras por subtítulo
 de la palabra activa) va en la sección "subtitulos" del JSON con valores propuestos;
 se revisan mirando `hoja.jpg` y se corrigen a mano antes de aplicar.
 
-Uso: python3 analizar_referencia.py referencia.mp4 carpeta_salida/
+Uso: python3 analizar_referencia.py referencia.mp4 carpeta_salida/ [--excluir x0,y0,x1,y1 ...]
 Salida: carpeta_salida/perfil.json, hoja.jpg, subs_*.jpg
 """
 import json
@@ -25,6 +25,9 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 REF, OUT = sys.argv[1], sys.argv[2]
+# --excluir x0,y0,x1,y1 (fracciones 0-1, repetible): zonas con gráficos fijos encima del vídeo
+# (paneles, logos) que no deben contar para el color
+EXCL = [tuple(float(v) for v in sys.argv[i + 1].split(",")) for i, a_ in enumerate(sys.argv) if a_ == "--excluir"]
 os.makedirs(OUT, exist_ok=True)
 
 
@@ -112,7 +115,14 @@ if HAS_AUDIO:
 # ------------------------------------------------------------------ color
 CW, CH = 180, 320
 samp = list(frames(REF, CW, CH, fps=4))
-px = np.concatenate([f.reshape(-1, 3) for f in samp]).astype(np.float32)
+# el etalonado se mide en los planos "normales": se descartan los fotogramas cuyo brillo
+# se aleja mucho de la mediana (tarjetas de papel, pantallas en blanco, fundidos a negro)
+fl = np.array([f.mean() for f in samp])
+normal = [f for f, m in zip(samp, fl) if abs(m - np.median(fl)) < 40] or samp
+mask = np.ones((CH, CW), bool)
+for x0, y0, x1, y1 in EXCL:
+    mask[int(y0 * CH):int(y1 * CH), int(x0 * CW):int(x1 * CW)] = False
+px = np.concatenate([f[mask] for f in normal]).astype(np.float32)
 pct = [1, 5, 10, 25, 50, 75, 90, 95, 99]
 curves = {c: [float(np.percentile(px[:, i], pct)[k]) for k in range(len(pct))] for i, c in enumerate("rgb")}
 lum = px @ np.array([0.2126, 0.7152, 0.0722], np.float32)

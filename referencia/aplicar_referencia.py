@@ -35,6 +35,8 @@ ap.add_argument("--fuentes", default=os.path.join(HERE, "fuentes"))
 ap.add_argument("--sin-cortes-de-pausa", action="store_true")
 ap.add_argument("--zoom", type=float, default=1.12, help="nivel del punch-in en cada cambio")
 ap.add_argument("--ancla-y", type=float, default=0.38, help="altura de la cara (0 arriba, 1 abajo) para el zoom")
+ap.add_argument("--intensidad-color", type=float, default=0.7,
+                help="0 = color original, 1 = curvas idénticas a la referencia")
 ap.add_argument("--prueba", type=float, nargs="*", help="solo guarda fotogramas en estos segundos")
 a = ap.parse_args()
 
@@ -186,11 +188,13 @@ for i, c in enumerate("rgb"):
     xs = np.concatenate([[0], np.maximum.accumulate(src), [255]])
     ys = np.concatenate([[0], np.maximum.accumulate(dst), [255]])
     xs = xs + np.arange(len(xs)) * 1e-3  # estrictamente creciente
-    luts.append(np.clip(np.interp(np.arange(256), xs, ys), 0, 255).astype(np.uint8))
+    full = np.interp(np.arange(256), xs, ys)
+    k_ = a.intensidad_color
+    luts.append(np.clip(np.arange(256) * (1 - k_) + full * k_, 0, 255).astype(np.uint8))
 mapped = np.stack([luts[i][px[:, i].astype(np.uint8)] for i in range(3)], 1).astype(np.float32)
 mx, mn = mapped.max(1), mapped.min(1)
 sat_now = float(np.where(mx > 0, (mx - mn) / (mx + 1e-6), 0).mean())
-SAT = float(np.clip(C["saturacion_media"] / (sat_now + 1e-6), 0.6, 1.6))
+SAT = float(np.clip(1 + (C["saturacion_media"] / (sat_now + 1e-6) - 1) * a.intensidad_color, 0.7, 1.35))
 
 
 def grade(f):
@@ -232,11 +236,24 @@ UP = SUB.get("mayusculas", False)
 CY = int(SUB.get("posicion_y", 0.6) * H)
 MAXW = int(W * 0.78)
 
+LMAXW = int(W * SUB.get("ancho_linea", 0.6))
 # grupos de N palabras, cortando también en fin de frase
 groups, cur = [], []
 for i, w in enumerate(nwords):
     cur.append(i)
-    if len(cur) >= NPER or w["w"][-1:] in ".?!,;:":
+    if MODE == "lineas":
+        nxt = nwords[i + 1]["w"] if i + 1 < len(nwords) else ""
+        long_ = FONT.getlength(" ".join(nwords[x]["w"] for x in cur + ([i + 1] if nxt else []))) > 2.1 * LMAXW
+        rest = 0  # palabras que quedan hasta el final de la frase
+        for x in nwords[i + 1:]:
+            rest += 1
+            if x["w"][-1:] in ".?!":
+                break
+        long_ = long_ and rest > 2
+        cut = w["w"][-1:] in ".?!" or (w["w"][-1:] in ",;:" and len(cur) >= 4 and rest > 2) or long_
+    else:
+        cut = w["w"][-1:] in ".?!,;:"
+    if len(cur) >= NPER or cut:
         groups.append(cur); cur = []
 if cur:
     groups.append(cur)
@@ -307,6 +324,69 @@ def caption_layer(gi, active):
     return _cache[key]
 
 
+BOX = hex2rgb(SUB.get("color_caja", "#FFFFFF"))
+CLAVES = {c.lower() for c in SUB.get("palabras_clave", [])}
+
+
+def key_word(ids):
+    """Palabra clave del grupo: una de palabras_clave si aparece; si no, la más larga (>= 5 letras)."""
+    for i in ids:
+        if clean(nwords[i]["w"]).strip(".?!¿¡").lower() in CLAVES:
+            return i
+    best = max(ids, key=lambda i: len(clean(nwords[i]["w"])))
+    return best if len(clean(nwords[best]["w"])) >= 5 else None
+
+
+def lines_layer(gi, active):
+    """Estilo 'lineas': una caja redondeada por línea, las líneas aparecen a medida que se dicen,
+    una palabra clave por grupo en color de resalte."""
+    key = ("L", gi, active)
+    if key in _cache:
+        return _cache[key]
+    ids = groups[gi]
+    toks = [clean(nwords[i]["w"]) for i in ids]
+    sp = FONT.getlength(" ")
+    lines, line = [], []
+    for j in range(len(toks)):
+        if line and FONT.getlength(" ".join(toks[x] for x in line + [j])) > LMAXW:
+            lines.append(line); line = []
+        line.append(j)
+    lines.append(line)
+    # sin palabra huérfana en la última línea
+    if len(lines) > 1 and len(lines[-1]) == 1 and len(lines[-2]) >= 3:
+        lines[-1].insert(0, lines[-2].pop())
+    act_j = ids.index(active)
+    shown = [ln for ln in lines if ln[0] <= act_j]
+    kw = key_word(ids)
+    fs = FONT.size
+    bh, gap, padx = int(fs * 1.55), int(fs * 0.1), int(fs * 0.32)
+    asc, desc = FONT.getmetrics()
+    lay = Image.new("RGBA", (W, (bh + gap) * len(lines) + 60), (0, 0, 0, 0))
+    d = ImageDraw.Draw(lay)
+    for li, ln in enumerate(shown):
+        text_w = sum(FONT.getlength(toks[j]) for j in ln) + sp * (len(ln) - 1)
+        x0 = (W - text_w) / 2
+        y0 = 30 + li * (bh + gap)
+        sh = Image.new("RGBA", lay.size, (0, 0, 0, 0))
+        ImageDraw.Draw(sh).rounded_rectangle((x0 - padx, y0 + 6, x0 + text_w + padx, y0 + bh + 6),
+                                             radius=int(fs * 0.24), fill=(0, 0, 0, 90))
+        lay.alpha_composite(sh.filter(ImageFilter.GaussianBlur(10)))
+        d.rounded_rectangle((x0 - padx, y0, x0 + text_w + padx, y0 + bh), radius=int(fs * 0.24), fill=BOX + (255,))
+        x = x0
+        ty = y0 + (bh - (asc + desc)) / 2
+        for j in ln:
+            col = HL if ids[j] == kw else INK
+            d.text((x, ty), toks[j], font=FONT, fill=col + (255,))
+            x += FONT.getlength(toks[j]) + sp
+    # el bloque crece hacia abajo desde CY (como en la referencia)
+    y = CY - (bh + gap) // 2 - 30
+    bottom = y + 30 + len(lines) * (bh + gap)
+    if bottom > 0.8 * H:  # zona segura: nada en el 20 % de abajo
+        y -= int(bottom - 0.8 * H)
+    _cache[key] = (lay, y)
+    return _cache[key]
+
+
 def caption_at(t):
     for gi, ids in enumerate(groups):
         s = nwords[ids[0]]["s"]
@@ -316,7 +396,7 @@ def caption_at(t):
             for i in ids:
                 if nwords[i]["s"] <= t:
                     act = i
-            return caption_layer(gi, act)
+            return lines_layer(gi, act) if MODE == "lineas" else caption_layer(gi, act)
     return None
 
 
