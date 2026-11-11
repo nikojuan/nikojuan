@@ -36,8 +36,12 @@ los mismos subtítulos y los mismos colores** que la referencia.
      `--excluir x0,y0,x1,y1` (fracciones) para que no cuenten en el color.
    - Comprueba también que `ritmo.cortes` tiene sentido (los cortes detectados de verdad).
 3. Transcribe la voz del vídeo nuevo (faster-whisper, `word_timestamps=True`) a
-   `[{"w","s","e"}, ...]`. Si el modelo no se puede descargar (red bloqueada), pide a Niko la transcripción
-   o los tiempos, y dilo en el informe.
+   `[{"w","s","e"}, ...]`. Si HuggingFace está bloqueado, el modelo Whisper small (CTranslate2 int8)
+   está en npm en 4 partes: `npm pack @skillninja/shortmovie-telop-model-p0` … `-p3` (solo datos, sin
+   scripts). Une `model.bin.part0..3` en `model.bin`, comprueba que el sha256 coincide con `model.sha256`
+   (ca732cb1…ce73) y pasa la carpeta a `WhisperModel(...)`. Pasa el audio como array numpy (16 kHz mono):
+   la versión de PyAV instalada falla al abrir el archivo directamente. Corrige marcas y términos
+   (p. ej. "polyester" → "poliéster"). Si nada funciona, pide la transcripción a Niko.
 4. Fotogramas de prueba primero y revísalos:
    `python3 referencia/aplicar_referencia.py trabajo/ref/perfil.json VIDEO.mp4 salida.mp4 --palabras p.json --prueba 1 4 8`
 5. Render completo (mismo comando sin `--prueba`). Ajusta `--ancla-y` si el zoom corta la cara y

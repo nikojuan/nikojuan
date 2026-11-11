@@ -125,6 +125,14 @@ def to_new(t):
 
 
 NDUR = sum(e - s for s, e in keep)
+# signos sueltos ("%", "€", "?") se pegan a la palabra anterior
+merged_w = []
+for w in words:
+    if merged_w and w["w"] and not any(ch.isalnum() for ch in w["w"]):
+        merged_w[-1] = dict(merged_w[-1], w=merged_w[-1]["w"] + ("" if w["w"] in ".,;:?!" else " ") + w["w"], e=w["e"])
+    else:
+        merged_w.append(dict(w))
+words = merged_w
 nwords = []
 for w in words:
     s, e = to_new(w["s"]), to_new(w["e"])
@@ -249,7 +257,8 @@ for i, w in enumerate(nwords):
             rest += 1
             if x["w"][-1:] in ".?!":
                 break
-        long_ = long_ and rest > 2
+        # si la siguiente palabra cierra la frase con coma, mejor cortar ahí
+        long_ = long_ and rest > 2 and not (nxt[-1:] in ",;:" and len(cur) < NPER - 1)
         cut = w["w"][-1:] in ".?!" or (w["w"][-1:] in ",;:" and len(cur) >= 4 and rest > 2) or long_
     else:
         cut = w["w"][-1:] in ".?!,;:"
