@@ -26,9 +26,3 @@ Fuentes OFL de `@fontsource` en `fuentes/`.
 salió de 21,5 s, con cambios de plano a 2,5 / 5,4 / 8,3 / 9,8 / 13,3 / 16,1 / 18,8 s (referencia: 2,4 / 5,2 / 8,2 / 9,8 / 13,3 / 16,2 / 18,8 s),
 saturación 0,124 (ref. 0,123) y brillo 142 (ref. 138).
 
-## Perfiles guardados
-- `perfiles/reel-efectos/`: reel de "20 video effects in 20 seconds" (Nov 2026). Plano medio de 1,74 s
-  (mediana 1,27 s), luz baja y contrastada, textos en cajas blancas por línea (Inter Tight Bold, texto
-  #131313, palabra clave en verde #1E4632), al 66 % de la altura. Se analizó con
-  `--excluir 0.69,0.11,1,0.6` para que el panel verde de la derecha no contara en el color.
-  No se copian: el panel "IN THIS VIDEO", los comentarios con avatar del creador ni sus tarjetas con su cara.
