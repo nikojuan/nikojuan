@@ -54,6 +54,6 @@ node render.js fonts timing.json prueba 3.7 12.6       # solo fotogramas de prue
 python3 sfx.py timing.json sfx.wav
 python3 music.py musica.wav 25.0 23.2                  # duración, inicio del cierre
 ffmpeg -i salida.mp4 -i assets/voz.wav -i musica.wav -i sfx.wav -filter_complex \
-  "[1:a]apad[v];[2:a]volume=-13.4dB[m];[3:a]volume=-8dB[s];[v][m][s]amix=inputs=3:normalize=0:duration=longest,volume=0.7dB,alimiter=limit=0.89,afade=t=out:st=24.5:d=0.5[a]" \
+  "[1:a]apad[v];[2:a]volume=-13.4dB[m];[3:a]volume=-8dB[s];[v][m][s]amix=inputs=3:normalize=0:duration=longest,volume=0.7dB,alimiter=limit=0.8,afade=t=out:st=24.5:d=0.5[a]" \
   -map 0:v -map "[a]" -c:v copy -c:a aac -b:a 192k -t 25 final.mp4
 ```
